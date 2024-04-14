@@ -6,11 +6,11 @@ using System.Windows.Input;
 
 namespace DVG_MITIPS
 {
-    public partial class MainWindow : Window
+    public partial class KnowledgeEditorWindow : Window
     {
         private readonly DvgViewModel _viewModel;
 
-        public MainWindow()
+        public KnowledgeEditorWindow()
         {
             InitializeComponent();
 
@@ -25,6 +25,12 @@ namespace DVG_MITIPS
             _viewModel.Requirements.CollectionChanged += Requirements_CollectionChanged;
 
             Loaded += MainWindow_Loaded;
+            Closed += MainWindow_Closed;
+        }
+
+        private void MainWindow_Closed(object? sender, EventArgs e)
+        {
+            this.Owner.Show();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -39,20 +45,20 @@ namespace DVG_MITIPS
             }
         }
 
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (knowledgeEditorTab.IsSelected)
-            {
-                Title = "Проектирование огорода. Решатель задач.";
+        //private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if (knowledgeEditorTab.IsSelected)
+        //    {
+        //        Title = "Проектирование огорода. Решатель задач.";
 
-                checkCompletenessButton.Visibility = Visibility.Visible;
-            }
-            else if (problemSolverTab.IsSelected)
-            {
-                Title = "Проектирование огорода. Редактор знаний.";
-                checkCompletenessButton.Visibility = Visibility.Collapsed;
-            }
-        }
+        //        checkCompletenessButton.Visibility = Visibility.Visible;
+        //    }
+        //    else if (problemSolverTab.IsSelected)
+        //    {
+        //        Title = "Проектирование огорода. Редактор знаний.";
+        //        checkCompletenessButton.Visibility = Visibility.Collapsed;
+        //    }
+        //}
 
         private void KnowledEditorTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
