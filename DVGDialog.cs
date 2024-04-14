@@ -2,6 +2,10 @@
 using System.Windows.Controls;
 using System.Windows;
 using ModernWpf.Controls.Primitives;
+using DVG_MITIPS.Types;
+using System.ComponentModel;
+using System.Xml.Linq;
+using System.Windows.Controls.Primitives;
 
 namespace DVG_MITIPS
 {
@@ -123,6 +127,71 @@ namespace DVG_MITIPS
                 };
 
                 await dialog.ShowAsync();
+            }
+
+            public static async void VegetableCharacteristicPromptDialog(Window owner, VegetableRequirement vegetableRequirement, Action<bool?, double, double> primaryAction)
+            {
+                var container = new SimpleStackPanel() { Spacing = 8 };
+
+                TextBox minValueBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
+                ControlHelper.SetHeader(minValueBox, "Значение От");
+                ControlHelper.SetPlaceholderText(minValueBox, vegetableRequirement.RangeMin.ToString());
+                minValueBox.Text = vegetableRequirement.RangeMin.ToString();
+
+                TextBox maxValueBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
+                ControlHelper.SetHeader(maxValueBox, "Значение До");
+                ControlHelper.SetPlaceholderText(maxValueBox, vegetableRequirement.RangeMax.ToString());
+                maxValueBox.Text = vegetableRequirement.RangeMax.ToString();
+
+                CheckBox chkBox = new CheckBox() { IsChecked = vegetableRequirement.InRange, Content = "В диапазоне" };
+                chkBox.Checked += (s, e) => ChkBox_Checked();
+                chkBox.Unchecked += (s, e) => ChkBox_Checked();
+                ChkBox_Checked();
+
+                var grd = new Grid();
+                grd.ColumnDefinitions.Add(new ColumnDefinition());
+                grd.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(8) }) ;
+                grd.ColumnDefinitions.Add(new ColumnDefinition());
+
+                grd.Children.Add(minValueBox);
+                grd.Children.Add(maxValueBox);
+
+                Grid.SetColumn(minValueBox, 0);
+                Grid.SetColumn(maxValueBox, 2);
+
+                container.Children.Add(chkBox);
+                container.Children.Add(grd);
+
+                ContentDialog dialog = new ContentDialog()
+                {
+                    Title = $"Изменения значения {vegetableRequirement.Requirement?.Name} для растения {vegetableRequirement.Vegetable?.Name}",
+                    Content = container,
+                    PrimaryButtonText = "Изменить",
+                    CloseButtonText = "Отмена",
+                    Owner = owner
+                };
+
+                dialog.PrimaryButtonClick += (o, e) =>
+                {
+                    dialog.Hide();
+                    primaryAction?.Invoke(
+                        chkBox.IsChecked,
+                        double.Parse(string.IsNullOrWhiteSpace(minValueBox.Text) ? vegetableRequirement.RangeMin.ToString() : minValueBox.Text),
+                        double.Parse(string.IsNullOrWhiteSpace(maxValueBox.Text) ? vegetableRequirement.RangeMax.ToString() : maxValueBox.Text)
+                    );
+                };
+
+                await dialog.ShowAsync();
+
+                return;
+
+                void ChkBox_Checked()
+                {
+                    bool isChecked = (bool) chkBox.IsChecked;
+                    Grid.SetColumnSpan(minValueBox, isChecked ? 1 : 3);
+                    ControlHelper.SetHeader(minValueBox, isChecked ? "Значение От" : "Значение");
+                    maxValueBox.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
+                }
             }
         }
     }

@@ -25,6 +25,8 @@ namespace DVG_MITIPS.Types
 
         public List<Requirement> Requirements { get; set; } = new();
 
+        public List<VegetableRequirement> VegetableRequirements { get; set; } = new();
+
         public Vegetable()
         {
             Name = string.Empty;

@@ -29,11 +29,11 @@ namespace DVG_MITIPS
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //var rd = _viewModel.GetRequirementsDescription();
-            foreach ( var v in _viewModel.Vegetables)
+            foreach (var v in _viewModel.Vegetables)
             {
-                Console.WriteLine( v.Name );
-                foreach( var requirement in v.Requirements ) {
+                Console.WriteLine(v.Name);
+                foreach (var requirement in v.Requirements)
+                {
                     Console.WriteLine("\t" + requirement.Name);
                 }
             }
@@ -294,7 +294,17 @@ namespace DVG_MITIPS
             var v = (Vegetable)rd_vegetableComboBox.SelectedItem;
             var r = (Requirement)rd_requirementComboBox.SelectedItem;
 
-            _viewModel.Vegetables.First(vg => vg.Id == v.Id).Requirements.Add(r);
+            //_viewModel.Vegetables.First(vg => vg.Id == v.Id).Requirements.Add(r);
+            _viewModel.VegetableRequirements.Add(new VegetableRequirement()
+            {
+                VegetableId = v.Id,
+                Vegetable = v,
+                RequirementId = r.Id,
+                Requirement = r,
+                RangeMin = r.MinValue,
+                RangeMax = r.MaxValue,
+            });
+
             _viewModel.SaveDatabase();
 
             RehandleVegetableRequirements();
@@ -302,7 +312,7 @@ namespace DVG_MITIPS
 
         private void rd_deleteRequirementButton_Click(object sender, RoutedEventArgs e)
         {
-            var rId = (int) ((Button)sender).Tag;
+            var rId = (int)((Button)sender).Tag;
             var v = (Vegetable)rd_vegetableComboBox.SelectedItem;
             var vo = _viewModel.Vegetables.First(vg => vg.Id == v.Id);
             vo.Requirements.RemoveAt(vo.Requirements.FindIndex(r => r.Id == rId));
@@ -318,7 +328,39 @@ namespace DVG_MITIPS
 
         private void ValueCharacteristicsTabOpen()
         {
+            vc_plantsComboBoxWarningLabel.Visibility = Visibility.Collapsed;
+            vc_plantsComboBox.Visibility = Visibility.Visible;
+            vc_ListBox.Visibility = Visibility.Collapsed;
 
+            if (_viewModel.Vegetables.Count == 0)
+            {
+                vc_plantsComboBoxWarningLabel.Visibility = Visibility.Visible;
+                vc_plantsComboBox.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (vc_plantsComboBox.SelectedItem == null)
+            {
+                vc_plantsComboBox.SelectedIndex = 0;
+            }
+
+            vc_ListBox.Visibility = Visibility.Visible;
+        }
+
+        private void vc_editValueCharacteristicButton_Click(object sender, RoutedEventArgs e)
+        {
+            var vcId = (int)((Button)sender).Tag;
+
+            var vc = _viewModel.VegetableRequirements.First(vc => vc.Id == vcId);
+
+            DvgDialog.Specified.VegetableCharacteristicPromptDialog(this, vc, (flag, min, max) =>
+            {
+                Console.WriteLine(flag + "  " + min + "  " + max);
+                vc.InRange = flag != null && (bool) flag;
+                vc.RangeMin = min;
+                vc.RangeMax = max;
+                _viewModel.SaveDatabase();
+            });
         }
 
         #endregion
@@ -371,8 +413,6 @@ namespace DVG_MITIPS
             }
         }
 
-        #endregion
-
         private void cp_addCompatiblePlant_Click(object sender, RoutedEventArgs e)
         {
             var v = (Vegetable)cp_plantsComboBox.SelectedItem;
@@ -386,14 +426,17 @@ namespace DVG_MITIPS
 
         private void cp_deleteCompatiblePlantButton_Click(object sender, RoutedEventArgs e)
         {
-            var cpId = (int)((Button)sender).Tag;
+            var vId = (int)((Button)sender).Tag;
             var v = (Vegetable)cp_plantsComboBox.SelectedItem;
             var vo = _viewModel.Vegetables.First(vg => vg.Id == v.Id);
-            vo.CompatibleVegetables.RemoveAt(vo.CompatibleVegetables.FindIndex(v => v.Id == cpId));
+            vo.CompatibleVegetables.RemoveAt(vo.CompatibleVegetables.FindIndex(v => v.Id == vId));
 
             _viewModel.SaveDatabase();
 
             RehandleVegetableCompatibility();
         }
+
+        #endregion
+
     }
 }

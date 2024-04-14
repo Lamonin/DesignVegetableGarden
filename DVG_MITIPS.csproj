@@ -9,6 +9,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icons\delete.png" />
+    <None Remove="Icons\edit.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\delete.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Icons\edit.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.4" />
     <PackageReference Include="ModernWpf.MessageBox" Version="0.5.2" />
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />

@@ -10,6 +10,7 @@ namespace DVG_MITIPS
 
         public ObservableCollection<Vegetable> Vegetables { get; set; }
         public ObservableCollection<Requirement> Requirements { get; set; }
+        public ObservableCollection<VegetableRequirement> VegetableRequirements { get; set; }
 
         public DvgViewModel()
         {
@@ -25,11 +26,7 @@ namespace DVG_MITIPS
 
             Vegetables = _context.Vegetables.Local.ToObservableCollection();
             Requirements = _context.Requirements.Local.ToObservableCollection();
-        }
-
-        public List<Vegetable> GetRequirementsDescription()
-        {
-            return _context.Vegetables.Include(v => v.Requirements).ToList();
+            VegetableRequirements = _context.VegetableRequirements.Local.ToObservableCollection();
         }
 
         public void SaveDatabase()
