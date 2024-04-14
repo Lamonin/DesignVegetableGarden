@@ -4,9 +4,11 @@ namespace DVG_MITIPS.Types
 {
     public class Vegetable : INotifyPropertyChanged
     {
-        private string _name;
+        private string? _name;
 
-        public string Name
+        public int Id { get; set; }
+
+        public string? Name
         {
             get { return _name; }
             set
@@ -19,12 +21,16 @@ namespace DVG_MITIPS.Types
             }
         }
 
+        public List<Vegetable> CompatibleVegetables { get; set; } = new();
+
+        public List<Requirement> Requirements { get; set; } = new();
+
         public Vegetable()
         {
             Name = string.Empty;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void NotifyPropertyChanged(string propertyName)
         {

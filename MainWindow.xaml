@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DVG_MITIPS"
         xmlns:converters="clr-namespace:DVG_MITIPS.Converters"
         mc:Ignorable="d"
-        Title="Проектирование огорода"
+        Title="Проектирование огорода" 
         Height="450"
         Width="800"
         MinWidth="720"
@@ -21,9 +21,9 @@
         <TabControl TabStripPlacement="Left" SelectionChanged="TabControl_SelectionChanged">
             <TabItem x:Name="knowledgeEditorTab" Header="Редактор знаний">
                 <Grid Margin="8 8 8 26">
-                    <TabControl SelectionChanged="TabControl_SelectionChanged_1">
+                    <TabControl SelectionChanged="KnowledEditorTabControl_SelectionChanged">
                         <TabItem x:Name="vegetablesTab"  Header="Растения">
-                            <Grid Margin="8 8 8 16">
+                            <Grid Margin="8 16 8 16">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="32px"/>
                                     <RowDefinition Height="4px"/>
@@ -46,7 +46,7 @@
                             </Grid>
                         </TabItem>
                         <TabItem x:Name="requirementTab" Header="Требования">
-                            <Grid Margin="8 8 8 16">
+                            <Grid Margin="8 16 8 16">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="32px"/>
                                     <RowDefinition Height="4px"/>
@@ -63,19 +63,76 @@
                                 <DataGrid x:Name="requirementDataGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" CanUserResizeColumns="False" CanUserReorderColumns="False" CanUserSortColumns="False" IsReadOnly="True" ItemsSource="{Binding Requirements}" AlternationCount="{Binding Items.Count, RelativeSource={RelativeSource Self}}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="№" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource indexConverter}}" Width="38"/>
-                                        <DataGridTextColumn Header="Название" Binding="{Binding Path=Name}" Width="*"/>
+                                        <DataGridTextColumn Header="Название" Binding="{Binding Path=Name}" Width="1*"/>
+                                        <DataGridTextColumn Header="Минимальное значение" Binding="{Binding Path=MinValue}" Width="auto"/>
+                                        <DataGridTextColumn Header="Максимальное значение" Binding="{Binding Path=MaxValue}" Width="auto"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Grid>
                         </TabItem>
                         <TabItem x:Name="requirementDescriptionTab" Header="Описание требований">
-                            <Grid Margin="8 8 8 16"></Grid>
+                            <ui:SimpleStackPanel Margin="8 8 8 16" Spacing="8">
+                                <TextBlock x:Name="rd_vegetableComboBoxWarningLabel" TextWrapping="Wrap">В базе знаний отсутствуют растения. Добавьте хотя бы одно растение на вкладке "Растения".</TextBlock>
+                                <ComboBox x:Name="rd_vegetableComboBox" ItemsSource="{Binding Vegetables}" DisplayMemberPath="Name" SelectedValuePath="Id" ui:ControlHelper.Header="Растение" Width="200" SelectionChanged="rd_vegetableComboBox_SelectionChanged"/>
+                                <TextBlock x:Name="rd_requirementComboBoxWarningLabel" TextWrapping="Wrap">В базе знаний отсутствуют требования. Добавьте хотя бы одно требование на вкладке "Требования".</TextBlock>
+                                <ui:SimpleStackPanel x:Name="rd_requirementStackPanel" Orientation="Horizontal" Spacing="8">
+                                    <ComboBox x:Name="rd_requirementComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" ui:ControlHelper.Header="Требование" Width="200"/>
+                                    <Button x:Name="rd_addRequirement" HorizontalAlignment="Left" Click="rd_addRequirement_Click" VerticalAlignment="Bottom">Добавить</Button>
+                                </ui:SimpleStackPanel>
+                                <ListBox x:Name="rd_ListBox" ItemsSource="{Binding SelectedItem.Requirements, ElementName=rd_vegetableComboBox}" Width="287" HorizontalAlignment="Left">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                            <Setter Property="Padding" Value="0"></Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Height="auto" Margin="12 8 8 8" HorizontalAlignment="Stretch">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="24px"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0"/>
+                                                <Button x:Name="rd_deleteRequirementButton" Content="×" Tag="{Binding Id}" ToolTip="Удалить требование" Grid.Column="1" Grid.Row="0" Padding="0" Width="24" Height="24" Click="rd_deleteRequirementButton_Click"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </ui:SimpleStackPanel>
                         </TabItem>
                         <TabItem x:Name="valueCharacteristicsTab" Header="Значение характеристик">
                             <Grid Margin="8 8 8 16"></Grid>
                         </TabItem>
-                        <TabItem x:Name="plantCompatibility" Header="Совместимость растений">
-                            <Grid Margin="8 8 8 16"></Grid>
+                        <TabItem x:Name="plantCompatibilityTab" Header="Совместимость растений">
+                            <ui:SimpleStackPanel Margin="8 8 8 16" Spacing="8">
+                                <TextBlock x:Name="cp_plantsComboBoxWarningLabel" TextWrapping="Wrap">В базе знаний отсутствуют растения. Добавьте хотя бы одно растение на вкладке "Растения".</TextBlock>
+                                <ComboBox x:Name="cp_plantsComboBox" ItemsSource="{Binding Vegetables}" DisplayMemberPath="Name" SelectedValuePath="Id" ui:ControlHelper.Header="Растение" Width="200" SelectionChanged="rd_vegetableComboBox_SelectionChanged"/>
+                                <ui:SimpleStackPanel x:Name="cp_compatibleStackPanel" Orientation="Horizontal" Spacing="8">
+                                    <ComboBox x:Name="cp_compatiblePlantsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" ui:ControlHelper.Header="Совместимые растения" Width="200"/>
+                                    <Button x:Name="cp_addCompatiblePlant" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="cp_addCompatiblePlant_Click">Добавить</Button>
+                                </ui:SimpleStackPanel>
+                                <ListBox x:Name="cp_ListBox" ItemsSource="{Binding SelectedItem.CompatibleVegetables, ElementName=cp_plantsComboBox}" Width="287" HorizontalAlignment="Left">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                            <Setter Property="Padding" Value="0"></Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Height="auto" Margin="12 8 8 8" HorizontalAlignment="Stretch">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="24px"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Grid.Column="0" Grid.Row="0"/>
+                                                <Button x:Name="cp_deleteCompatiblePlantButton" Content="×" Tag="{Binding Id}" ToolTip="Удалить совместимое растение" Grid.Column="1" Grid.Row="0" Padding="0" Width="24" Height="24" Click="cp_deleteCompatiblePlantButton_Click"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </ui:SimpleStackPanel>
                         </TabItem>
                     </TabControl>
                 </Grid>
@@ -86,7 +143,7 @@
                 </Grid>
             </TabItem> `
         </TabControl>
-        <Canvas>
+        <Canvas d:IsHidden="True">
             <Button x:Name="checkCompletenessButton" Content="Проверить полноту" Canvas.Right="16" Canvas.Bottom="8" FontSize="12"/>
         </Canvas>
     </Grid>
