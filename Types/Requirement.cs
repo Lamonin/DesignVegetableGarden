@@ -31,6 +31,12 @@ namespace DVG_MITIPS.Types
                 if (_minValue != value)
                 {
                     _minValue = value;
+
+                    if (_minValue > _maxValue)
+                    {
+                        _minValue = _maxValue;
+                    }
+
                     NotifyPropertyChanged(nameof(MinValue));
                 }
             }
@@ -44,6 +50,12 @@ namespace DVG_MITIPS.Types
                 if (_maxValue != value)
                 {
                     _maxValue = value;
+
+                    if (_maxValue < _minValue)
+                    {
+                        _maxValue = _minValue;
+                    }
+
                     NotifyPropertyChanged(nameof(MaxValue));
                 }
             }

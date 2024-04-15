@@ -36,6 +36,12 @@ namespace DVG_MITIPS.Types
                 if (_rangeMin == value) return;
 
                 _rangeMin = value;
+
+                if (_rangeMin > RangeMax)
+                {
+                    _rangeMin = RangeMax;
+                }
+
                 NotifyPropertyChanged(nameof(RangeMin));
             }
         }
@@ -47,6 +53,12 @@ namespace DVG_MITIPS.Types
                 if (_rangeMax == value) return;
 
                 _rangeMax = value;
+
+                if (_rangeMax < RangeMin)
+                {
+                    _rangeMax = RangeMin;
+                }
+
                 NotifyPropertyChanged(nameof(RangeMax));
             }
         }

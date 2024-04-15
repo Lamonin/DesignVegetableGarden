@@ -1,7 +1,10 @@
 ﻿using DVG_MITIPS.Types;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace DVG_MITIPS
 {
@@ -34,7 +37,7 @@ namespace DVG_MITIPS
                     new GardenCharacteristic()
                     {
                         Name = requirement.Name,
-                        InRange = false,
+                        InRange = true,
                         RangeMin = requirement.MinValue,
                         RangeMax = requirement.MaxValue,
                     }
@@ -53,18 +56,24 @@ namespace DVG_MITIPS
         private void makeGardenProjectButton_Click(object sender, RoutedEventArgs e)
         {
             problemSolverDataInputGrid.Visibility = Visibility.Collapsed;
-            problemSolverResultGrid.Visibility= Visibility.Visible;
+            problemSolverResultGrid.Visibility = Visibility.Visible;
 
             var vegetablesThatCanBePlant = new List<Vegetable>();
             var gardenCharacteristics = GardenCharacteristics.ToDictionary(gc => gc.Name, gc => gc);
 
+            foreach (var gc in gardenCharacteristics)
+            {
+                Console.WriteLine(gc.Key);
+                Console.WriteLine("\t" + gc.Value.RangeMin);
+                Console.WriteLine("\t" + gc.Value.RangeMax);
+            }
+
             foreach (var vegetable in _viewModel.Vegetables)
             {
-                bool isCanPlanted = false;
+                bool isCanPlanted = true;
 
                 foreach (var vr in vegetable.VegetableRequirements)
                 {
-                    var tempCanPlanted = isCanPlanted;
                     var gc = gardenCharacteristics[vr.Requirement.Name];
                     if (vr.InRange)
                     {
@@ -76,7 +85,7 @@ namespace DVG_MITIPS
                         else
                         {
                             // Если значение почвы попало в диапазон растения
-                            isCanPlanted = isCanPlanted && (vr.RangeMin <= gc.RangeMin && vr.RangeMax >= gc.RangeMin);
+                            isCanPlanted = isCanPlanted && (vr.RangeMin <= gc.RangeMin && gc.RangeMin <= vr.RangeMax);
                         }
                     }
                     else
@@ -93,8 +102,7 @@ namespace DVG_MITIPS
                         }
                     }
 
-                    // Если мог посадить до проверок, а теперь не может - значит нет нужды проверять всё остальное
-                    if (tempCanPlanted && !isCanPlanted)
+                    if (!isCanPlanted)
                     {
                         break;
                     }
@@ -113,7 +121,7 @@ namespace DVG_MITIPS
             for (int i = 0; i < vegetablesThatCanBePlant.Count; i++)
             {
                 Vegetable v = vegetablesThatCanBePlant[i];
-                resultText += $"{i + 1}. {v.Name}";
+                resultText += $"\n{i + 1}. {v.Name}";
             }
 
             problemSolverResultTextBlock.Text = resultText;
@@ -123,6 +131,15 @@ namespace DVG_MITIPS
         {
             problemSolverDataInputGrid.Visibility = Visibility.Visible;
             problemSolverResultGrid.Visibility = Visibility.Collapsed;
+        }
+
+        private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            var textBox = (TextBox)sender;
+
+            var fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
+
+            e.Handled = !double.TryParse(fullText, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _);
         }
     }
 }

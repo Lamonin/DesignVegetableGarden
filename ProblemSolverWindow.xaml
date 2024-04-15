@@ -9,8 +9,8 @@
     Title="Проектирование огорода. Решатель задач."
     Width="600"
     Height="400"
-    MinWidth="500"
-    MinHeight="300"
+    MinWidth="600"
+    MinHeight="400"
     ui:WindowHelper.UseModernWindowStyle="True"
     mc:Ignorable="d">
     <Grid>
@@ -64,7 +64,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Width="120" MinWidth="120">
+                    <DataGridTemplateColumn Width="122" MinWidth="122">
                         <DataGridTemplateColumn.Header>
                             <TextBlock Margin="20,0,0,0">Значение</TextBlock>
                         </DataGridTemplateColumn.Header>
@@ -84,11 +84,18 @@
                                         Padding="0"
                                         VerticalContentAlignment="Center"
                                         FontSize="12"
-                                        Text="{Binding RangeMin}"
+                                        PreviewTextInput="TextBox_PreviewTextInput"
                                         TextAlignment="Center">
                                         <TextBox.Style>
                                             <Style />
                                         </TextBox.Style>
+                                        <TextBox.Text>
+                                            <Binding Path="RangeMin" UpdateSourceTrigger="LostFocus">
+                                                <Binding.ValidationRules>
+                                                    <DataErrorValidationRule />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
                                     </TextBox>
                                     <TextBox
                                         Grid.Column="1"
@@ -99,7 +106,7 @@
                                         Padding="0"
                                         VerticalContentAlignment="Center"
                                         FontSize="12"
-                                        Text="{Binding RangeMax}"
+                                        PreviewTextInput="TextBox_PreviewTextInput"
                                         TextAlignment="Center">
                                         <TextBox.Style>
                                             <Style TargetType="{x:Type TextBox}">
@@ -113,6 +120,13 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </TextBox.Style>
+                                        <TextBox.Text>
+                                            <Binding Path="RangeMax" UpdateSourceTrigger="LostFocus">
+                                                <Binding.ValidationRules>
+                                                    <DataErrorValidationRule />
+                                                </Binding.ValidationRules>
+                                            </Binding>
+                                        </TextBox.Text>
                                     </TextBox>
                                 </Grid>
                             </DataTemplate>
