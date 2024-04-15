@@ -177,7 +177,7 @@
                             x:Name="rd_vegetableComboBox"
                             Grid.Row="2"
                             Width="200"
-                            ui:ControlHelper.Header="Растение"
+                            ui:ControlHelper.Header="Выберите растение"
                             DisplayMemberPath="Name"
                             ItemsSource="{Binding Vegetables}"
                             SelectedValuePath="Id"
@@ -194,7 +194,7 @@
                             <ComboBox
                                 x:Name="rd_requirementComboBox"
                                 Width="200"
-                                ui:ControlHelper.Header="Требование"
+                                ui:ControlHelper.Header="Требования"
                                 DisplayMemberPath="Name"
                                 SelectedValuePath="Id" />
                             <Button
@@ -272,7 +272,7 @@
                             x:Name="vc_plantsComboBox"
                             Grid.Row="2"
                             Width="200"
-                            ui:ControlHelper.Header="Растение"
+                            ui:ControlHelper.Header="Выберите растение"
                             DisplayMemberPath="Name"
                             ItemsSource="{Binding Vegetables}"
                             SelectedValuePath="Id"
@@ -369,7 +369,7 @@
                             x:Name="cp_plantsComboBox"
                             Grid.Row="2"
                             Width="200"
-                            ui:ControlHelper.Header="Растение"
+                            ui:ControlHelper.Header="Выберите растение"
                             DisplayMemberPath="Name"
                             ItemsSource="{Binding Vegetables}"
                             SelectedValuePath="Id"

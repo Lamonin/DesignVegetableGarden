@@ -1,8 +1,6 @@
 ﻿using DVG_MITIPS.Types;
-using ModernWpf.Controls.Primitives;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace DVG_MITIPS
 {
@@ -24,41 +22,14 @@ namespace DVG_MITIPS
             _viewModel.Vegetables.CollectionChanged += Vegetables_CollectionChanged;
             _viewModel.Requirements.CollectionChanged += Requirements_CollectionChanged;
 
-            Loaded += MainWindow_Loaded;
             Closed += MainWindow_Closed;
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e)
         {
             this.Owner.Show();
+            this.Owner.Focus();
         }
-
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            foreach (var v in _viewModel.Vegetables)
-            {
-                Console.WriteLine(v.Name);
-                foreach (var requirement in v.Requirements)
-                {
-                    Console.WriteLine("\t" + requirement.Name);
-                }
-            }
-        }
-
-        //private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if (knowledgeEditorTab.IsSelected)
-        //    {
-        //        Title = "Проектирование огорода. Решатель задач.";
-
-        //        checkCompletenessButton.Visibility = Visibility.Visible;
-        //    }
-        //    else if (problemSolverTab.IsSelected)
-        //    {
-        //        Title = "Проектирование огорода. Редактор знаний.";
-        //        checkCompletenessButton.Visibility = Visibility.Collapsed;
-        //    }
-        //}
 
         private void KnowledEditorTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
