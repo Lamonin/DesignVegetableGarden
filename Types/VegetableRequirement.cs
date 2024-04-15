@@ -4,7 +4,6 @@ namespace DVG_MITIPS.Types
 {
     public class VegetableRequirement : INotifyPropertyChanged
     {
-        private bool _inRange;
         private double _rangeMin;
         private double _rangeMax;
 
@@ -18,24 +17,24 @@ namespace DVG_MITIPS.Types
 
         public Requirement? Requirement { get; set; }
 
-        public bool InRange
-        {
-            get => _inRange; set
-            {
-                if (_inRange == value) return;
-
-                _inRange = value;
-                NotifyPropertyChanged(nameof(InRange));
-            }
-        }
 
         public double RangeMin
         {
             get => _rangeMin; set
             {
-                if (_rangeMin == value) return;
-
                 _rangeMin = value;
+
+                if (Requirement != null)
+                {
+                    if (_rangeMin < Requirement.MinValue)
+                    {
+                        _rangeMin = Requirement.MinValue;
+                    }
+                    else if (_rangeMin > Requirement.MaxValue)
+                    {
+                        _rangeMin = Requirement.MaxValue;
+                    }
+                }
 
                 if (_rangeMin > RangeMax)
                 {
@@ -50,9 +49,19 @@ namespace DVG_MITIPS.Types
         {
             get => _rangeMax; set
             {
-                if (_rangeMax == value) return;
-
                 _rangeMax = value;
+
+                if (Requirement != null)
+                {
+                    if (_rangeMax < Requirement.MinValue)
+                    {
+                        _rangeMax = Requirement.MinValue;
+                    }
+                    else if (_rangeMax > Requirement.MaxValue)
+                    {
+                        _rangeMax = Requirement.MaxValue;
+                    }
+                }
 
                 if (_rangeMax < RangeMin)
                 {

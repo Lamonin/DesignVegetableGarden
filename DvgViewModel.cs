@@ -21,7 +21,7 @@ namespace DVG_MITIPS
 
             _context.Database.EnsureCreated();
 
-            _context.Vegetables.Include(v => v.CompatibleVegetables).Load();
+            _context.Vegetables.Include(v => v.CompatibleVegetables).Include(v => v.Requirements).Include(v => v.VegetableRequirements).Load();
             _context.Requirements.Load();
 
             Vegetables = _context.Vegetables.Local.ToObservableCollection();

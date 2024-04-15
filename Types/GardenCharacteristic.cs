@@ -3,93 +3,34 @@
 namespace DVG_MITIPS.Types
 {
 
-    public class GardenCharacteristic : INotifyPropertyChanged, IDataErrorInfo
+    public class GardenCharacteristic : INotifyPropertyChanged
     {
-        private string name;
+        private string _name = "";
+        private double _value;
+
         public string Name
         {
-            get { return name; }
+            get { return _name; }
             set
             {
-                if (name != value)
+                if (_name != value)
                 {
-                    name = value;
+                    _name = value;
                     NotifyPropertyChanged(nameof(Name));
                 }
             }
         }
 
-        private bool inRange;
-        public bool InRange
+        public double Value
         {
-            get { return inRange; }
+            get { return _value; }
             set
             {
-                if (inRange != value)
+                if (_value != value)
                 {
-                    if (value)
-                    {
-                        if (RangeMax < RangeMin)
-                        {
-                            RangeMax = RangeMin;
-                        }
-                    }
-                    inRange = value;
-                    NotifyPropertyChanged(nameof(InRange));
+                    _value = value;
+                    NotifyPropertyChanged(nameof(Value));
                 }
-            }
-        }
-
-        private double rangeMin;
-        public double RangeMin
-        {
-            get { return rangeMin; }
-            set
-            {
-                if (rangeMin != value)
-                {
-                    rangeMin = value;
-                    NotifyPropertyChanged(nameof(RangeMin));
-                }
-            }
-        }
-
-        private double rangeMax;
-        public double RangeMax
-        {
-            get { return rangeMax; }
-            set
-            {
-                if (rangeMax != value)
-                {
-                    rangeMax = value;
-                    NotifyPropertyChanged(nameof(RangeMax));
-                }
-            }
-        }
-
-        public string Error => "Некорректные данные";
-
-        public string this[string columnName] {
-            get
-            {
-                string error = String.Empty;
-                switch (columnName)
-                {
-                    case "RangeMin":
-                        if (RangeMin > RangeMax && InRange)
-                        {
-                            RangeMin = RangeMax;
-                        }
-                        break;
-                    case "RangeMax":
-                        if (RangeMax < RangeMin && InRange)
-                        {
-                            RangeMax = RangeMin;
-                        }
-                        break;
-                }
-                return error;
             }
         }
 

@@ -20,8 +20,6 @@ namespace DVG_MITIPS
                 .HasMany(v => v.Requirements)
                 .WithMany(r => r.Vegetables)
                 .UsingEntity<VegetableRequirement>();
-            modelBuilder.Entity<Vegetable>().Navigation(v => v.Requirements).AutoInclude();
-            modelBuilder.Entity<Vegetable>().Navigation(v => v.VegetableRequirements).AutoInclude();
             modelBuilder.Entity<Vegetable>().HasMany(v => v.CompatibleVegetables).WithMany();
         }
     }

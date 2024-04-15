@@ -179,6 +179,17 @@ namespace DVG_MITIPS
                         selectedRequirement.MinValue = min;
                         selectedRequirement.MaxValue = max;
                         requirementDataGrid.Items.Refresh();
+
+                        foreach (var vegetable in _viewModel.Vegetables)
+                        {
+                            foreach (var vr in vegetable.VegetableRequirements)
+                            {
+                                Console.WriteLine("Updated " + vegetable.Name);
+                                vr.RangeMin = vr.RangeMin;
+                                vr.RangeMax = vr.RangeMax;
+                            }
+                        }
+
                         _viewModel.SaveDatabase();
                     }
                 }, selectedRequirement.Name, selectedRequirement.MinValue, selectedRequirement.MaxValue);
@@ -322,6 +333,7 @@ namespace DVG_MITIPS
             }
 
             vc_ListBox.Visibility = Visibility.Visible;
+            vc_ListBox.Items.Refresh();
         }
 
         private void vc_editValueCharacteristicButton_Click(object sender, RoutedEventArgs e)
@@ -330,10 +342,8 @@ namespace DVG_MITIPS
 
             var vc = _viewModel.VegetableRequirements.First(vc => vc.Id == vcId);
 
-            DvgDialog.Specified.VegetableCharacteristicPromptDialog(this, vc, (flag, min, max) =>
+            DvgDialog.Specified.VegetableCharacteristicPromptDialog(this, vc, (min, max) =>
             {
-                Console.WriteLine(flag + "  " + min + "  " + max);
-                vc.InRange = flag != null && (bool) flag;
                 vc.RangeMin = min;
                 vc.RangeMax = max;
                 _viewModel.SaveDatabase();

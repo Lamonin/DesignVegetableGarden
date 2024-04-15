@@ -18,19 +18,46 @@
             x:Name="problemSolverDataInputGrid"
             Margin="16,16,8,16"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch">
+            VerticalAlignment="Stretch"
+            d:IsHidden="True">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="32" />
             </Grid.RowDefinitions>
-            <Label Margin="0,0,0,8">
+            <TextBlock TextWrapping="Wrap">
                 Введите характеристики почвы вашего огорода и нажмите кнопку "Спроектировать огород"
-            </Label>
+            </TextBlock>
+            <ui:SimpleStackPanel
+                x:Name="requirementsStackPanel"
+                Grid.Row="1"
+                Margin="0,8,0,0"
+                Orientation="Horizontal"
+                Spacing="8">
+                <ComboBox
+                    x:Name="requirementsComboBox"
+                    Width="200"
+                    ui:ControlHelper.Header="Характеристика"
+                    DisplayMemberPath="Name" />
+                <Button
+                    x:Name="addRequirementToGardenButton"
+                    VerticalAlignment="Bottom"
+                    Click="addRequirementToGardenButton_Click">
+                    Добавить
+                </Button>
+            </ui:SimpleStackPanel>
+            <TextBlock
+                x:Name="requirementWarning"
+                Grid.Row="2"
+                Margin="0,8,0,0"
+                TextWrapping="Wrap">
+                Выберите требование из списка выше и нажмите кнопку "Добавить"
+            </TextBlock>
             <DataGrid
                 x:Name="characteristicsDataGrid"
-                Grid.Row="1"
-                Margin="0,0,0,8"
+                Grid.Row="2"
+                Margin="0,8,0,8"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
@@ -47,34 +74,10 @@
                         Binding="{Binding Name}"
                         Header="Характеристика"
                         IsReadOnly="True" />
-                    <DataGridTemplateColumn Width="93" MinWidth="93">
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock>В диапазоне</TextBlock>
-                        </DataGridTemplateColumn.Header>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Grid HorizontalAlignment="Stretch">
-                                    <CheckBox
-                                        MinWidth="16"
-                                        MinHeight="16"
-                                        Padding="0"
-                                        HorizontalAlignment="Center"
-                                        IsChecked="{Binding InRange, UpdateSourceTrigger=PropertyChanged}" />
-                                </Grid>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Width="122" MinWidth="122">
-                        <DataGridTemplateColumn.Header>
-                            <TextBlock Margin="20,0,0,0">Значение</TextBlock>
-                        </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn Width="SizeToHeader" Header="Значение">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Margin="8,0,8,0" HorizontalAlignment="Center">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="auto" />
-                                    </Grid.ColumnDefinitions>
                                     <TextBox
                                         Grid.Column="0"
                                         Height="24"
@@ -85,49 +88,37 @@
                                         VerticalContentAlignment="Center"
                                         FontSize="12"
                                         PreviewTextInput="TextBox_PreviewTextInput"
+                                        Text="{Binding Value, UpdateSourceTrigger=LostFocus}"
                                         TextAlignment="Center">
                                         <TextBox.Style>
                                             <Style />
                                         </TextBox.Style>
-                                        <TextBox.Text>
-                                            <Binding Path="RangeMin" UpdateSourceTrigger="LostFocus">
-                                                <Binding.ValidationRules>
-                                                    <DataErrorValidationRule />
-                                                </Binding.ValidationRules>
-                                            </Binding>
-                                        </TextBox.Text>
                                     </TextBox>
-                                    <TextBox
-                                        Grid.Column="1"
-                                        Height="24"
-                                        MinWidth="48"
-                                        MinHeight="24"
-                                        Margin="8,0,0,0"
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="auto" Header="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Margin="8,0,8,0" HorizontalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        x:Name="deleteRequirementButton"
+                                        Margin="0"
                                         Padding="0"
+                                        HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center"
-                                        FontSize="12"
-                                        PreviewTextInput="TextBox_PreviewTextInput"
-                                        TextAlignment="Center">
-                                        <TextBox.Style>
-                                            <Style TargetType="{x:Type TextBox}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding InRange}" Value="False">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding InRange}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBox.Style>
-                                        <TextBox.Text>
-                                            <Binding Path="RangeMax" UpdateSourceTrigger="LostFocus">
-                                                <Binding.ValidationRules>
-                                                    <DataErrorValidationRule />
-                                                </Binding.ValidationRules>
-                                            </Binding>
-                                        </TextBox.Text>
-                                    </TextBox>
+                                        Background="#00000000"
+                                        Click="deleteRequirementButton_Click"
+                                        Tag="{Binding Name}">
+                                        <Image
+                                            Width="16"
+                                            Height="16"
+                                            Source="Icons/delete.png" />
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -136,7 +127,7 @@
             </DataGrid>
             <Button
                 x:Name="makeGardenProjectButton"
-                Grid.Row="2"
+                Grid.Row="3"
                 HorizontalAlignment="Right"
                 Click="makeGardenProjectButton_Click">
                 Спроектировать огород
@@ -146,16 +137,36 @@
             x:Name="problemSolverResultGrid"
             Margin="16"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            d:IsHidden="True">
+            VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="32" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="problemSolverResultTextBlock">
-                На огороде можно разместить следующие растения:<LineBreak />
-                1. Огурец<LineBreak />
-                2. Морковь</TextBlock>
+            <TextBlock x:Name="problemSolverResultTextBlock" Visibility="Collapsed" />
+            <ScrollViewer
+                MaxHeight="180"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                VerticalScrollBarVisibility="Hidden">
+                <ItemsControl x:Name="gardenProjectsItemsControl" ItemsSource="{Binding GardenProjects}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ui:SimpleStackPanel Spacing="8" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ui:SimpleStackPanel Orientation="Horizontal" Spacing="16">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Name}"
+                                    TextWrapping="NoWrap" />
+                                <Button Click="showGardenProjectButton" Tag="{Binding Id}">Показать</Button>
+                            </ui:SimpleStackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
             <Button
                 x:Name="backToInputDataGridButton"
                 Grid.Row="1"

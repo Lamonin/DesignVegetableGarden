@@ -68,14 +68,10 @@
                             CanUserReorderColumns="False"
                             CanUserResizeColumns="False"
                             CanUserResizeRows="False"
-                            CanUserSortColumns="False"
+                            GridLinesVisibility="All"
                             IsReadOnly="True"
                             ItemsSource="{Binding Vegetables}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn
-                                    Width="38"
-                                    Binding="{Binding AlternationIndex, Converter={StaticResource indexConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}"
-                                    Header="№" />
                                 <DataGridTextColumn
                                     Width="*"
                                     Binding="{Binding Name}"
@@ -132,14 +128,10 @@
                             CanUserReorderColumns="False"
                             CanUserResizeColumns="False"
                             CanUserResizeRows="False"
-                            CanUserSortColumns="False"
+                            GridLinesVisibility="All"
                             IsReadOnly="True"
                             ItemsSource="{Binding Requirements}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn
-                                    Width="38"
-                                    Binding="{Binding AlternationIndex, Converter={StaticResource indexConverter}, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}}"
-                                    Header="№" />
                                 <DataGridTextColumn
                                     Width="1*"
                                     Binding="{Binding Name}"
@@ -309,25 +301,12 @@
                                             Grid.Column="1"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center">
-                                            <TextBlock.Style>
-                                                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding InRange}" Value="False">
-                                                            <Setter Property="Text" Value="{Binding RangeMin, StringFormat=Значение:  \{0\}}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding InRange}" Value="True">
-                                                            <Setter Property="Text">
-                                                                <Setter.Value>
-                                                                    <MultiBinding StringFormat="Значение:  {0} - {1}">
-                                                                        <Binding Path="RangeMin" />
-                                                                        <Binding Path="RangeMax" />
-                                                                    </MultiBinding>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="Значение:  {0} - {1}">
+                                                    <Binding Path="RangeMin" />
+                                                    <Binding Path="RangeMax" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
                                         </TextBlock>
                                         <Button
                                             x:Name="vc_editValueCharacteristicButton"
