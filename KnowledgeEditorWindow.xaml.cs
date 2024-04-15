@@ -415,5 +415,9 @@ namespace DVG_MITIPS
 
         #endregion
 
+        private void checkCompletenessButton_Click(object sender, RoutedEventArgs e)
+        {
+            DvgDialog.Specified.CompletenesResultDialog(this, _viewModel);
+        }
     }
 }

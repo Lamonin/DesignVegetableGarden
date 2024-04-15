@@ -193,6 +193,57 @@ namespace DVG_MITIPS
                     maxValueBox.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
                 }
             }
+
+            public static async void CompletenesResultDialog(Window owner, DvgViewModel viewModel)
+            {
+                // Check completenes logic
+                var plantsWithoutCompatibles = new List<Vegetable>();
+                foreach (var vegetable in viewModel.Vegetables)
+                {
+                    if (vegetable.CompatibleVegetables.Count == 0)
+                    {
+                        plantsWithoutCompatibles.Add(vegetable);
+                    }
+                }
+
+                // Build result text
+                var resultText = "";
+                if (plantsWithoutCompatibles.Count > 0)
+                {
+                    resultText = "Растения, которые не совместимы ни с одним растением:";
+                    for (int i = 0; i < plantsWithoutCompatibles.Count; i++)
+                    {
+                        Vegetable? plant = plantsWithoutCompatibles[i];
+                        resultText += $"\n{i + 1}. {plant.Name}";
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(resultText))
+                {
+                    resultText = "Проверка прошла успешно. Все разделы корректно заполнены.";
+                }
+
+                // Dialog build logic
+                var container = new SimpleStackPanel() { Spacing = 8 };
+                var resultTextBlock = new TextBlock() { Text = resultText };
+
+                container.Children.Add(resultTextBlock);
+
+                var dialog = new ContentDialog()
+                {
+                    Title = $"Результаты проверки полноты",
+                    Content = container,
+                    CloseButtonText = "Принять",
+                    Owner = owner
+                };
+
+                dialog.CloseButtonClick += (o, e) =>
+                {
+                    dialog.Hide();
+                };
+
+                await dialog.ShowAsync();
+            }
         }
     }
 }

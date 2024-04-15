@@ -447,6 +447,7 @@
                 x:Name="checkCompletenessButton"
                 Canvas.Right="16"
                 Canvas.Bottom="8"
+                Click="checkCompletenessButton_Click"
                 Content="Проверить полноту"
                 FontSize="12" />
         </Canvas>
