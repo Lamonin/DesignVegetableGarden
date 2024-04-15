@@ -43,9 +43,6 @@ namespace DVG_MITIPS
 
         private void makeGardenProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            problemSolverDataInputGrid.Visibility = Visibility.Collapsed;
-            problemSolverResultGrid.Visibility = Visibility.Visible;
-
             var vegetablesThatCanBePlant = new List<Vegetable>();
             var gardenCharacteristics = GardenCharacteristics.ToDictionary(gc => gc.Name, gc => gc);
 
@@ -53,8 +50,9 @@ namespace DVG_MITIPS
             {
                 Console.WriteLine(gc.Key);
                 Console.WriteLine("\t" + gc.Value.Value);
-                Console.WriteLine("\t" + gc.Value.Value);
             }
+
+            var unnasignedRequirements = new HashSet<Requirement>();
 
             foreach (var vegetable in _viewModel.Vegetables)
             {
@@ -64,20 +62,14 @@ namespace DVG_MITIPS
                 {
                     if (!gardenCharacteristics.ContainsKey(vr.Requirement.Name))
                     {
-                        Console.WriteLine("Ошибка. Ошибка. Ошибка.");
-                        break;
+                        unnasignedRequirements.Add(vr.Requirement);
+                        continue;
                     }
+
                     var gc = gardenCharacteristics[vr.Requirement.Name];
 
                     isCanPlanted = isCanPlanted && (vr.RangeMin <= gc.Value && gc.Value <= vr.RangeMax);
-
-                    if (!isCanPlanted)
-                    {
-                        break;
-                    }
                 }
-
-
 
                 if (isCanPlanted)
                 {
@@ -85,23 +77,36 @@ namespace DVG_MITIPS
                 }
             }
 
+            var badList = new List<(GardenCharacteristic gc, Requirement r)>();
+
+            foreach (var characteristic in GardenCharacteristics)
+            {
+                var r = _viewModel.Requirements.First(r => r.Name == characteristic.Name);
+                if (characteristic.Value < r.MinValue || characteristic.Value > r.MaxValue)
+                {
+                    badList.Add((characteristic, r));
+                }
+            }
+
+            if (vegetablesThatCanBePlant.Count == 0 || unnasignedRequirements.Count > 0 || badList.Count > 0)
+            {
+                DvgDialog.Specified.GardenProjectFailedDialog(this, _viewModel, GardenCharacteristics.ToList(), unnasignedRequirements.ToList(), badList);
+                return;
+            }
+
+            problemSolverDataInputGrid.Visibility = Visibility.Collapsed;
+            problemSolverResultGrid.Visibility = Visibility.Visible;
+
+            gardenProjectsScrollView.Visibility = Visibility.Visible;
+            problemSolverResultTextBlock.Visibility = Visibility.Collapsed;
+
             var compatibleSets = FindCompatibleSets(vegetablesThatCanBePlant).OrderByDescending(set => set.Count);
-            //vegetablesThatCanBePlant = FindLargestCompatibleSet(vegetablesThatCanBePlant);
-
-            //var resultText = vegetablesThatCanBePlant.Count > 0
-            //    ? "На огороде можно разместить следующие растения:"
-            //    : "На огороде нельзя разместить ни одного растения.";
-
-
-            //for (int i = 0; i < vegetablesThatCanBePlant.Count; i++)
-            //{
-            //    Vegetable v = vegetablesThatCanBePlant[i];
-            //    resultText += $"\n{i + 1}. {v.Name}";
-            //}
 
             GardenProjects.Clear();
-            var maxSetSize = compatibleSets.First().Count;
+
             int idx = 0;
+            var maxSetSize = compatibleSets.First().Count;
+
             foreach (var compatibleSet in compatibleSets)
             {
                 if (compatibleSet.Count != maxSetSize)
@@ -120,8 +125,6 @@ namespace DVG_MITIPS
             }
 
             gardenProjectsItemsControl.Items.Refresh();
-
-            //problemSolverResultTextBlock.Text = resultText;
         }
 
         public static List<List<Vegetable>> FindCompatibleSets(List<Vegetable> vegetables)
@@ -135,51 +138,22 @@ namespace DVG_MITIPS
                 {
                     if (set.All(v => v.CompatibleVegetables.Contains(veg)))
                     {
-                        var newSet = new List<Vegetable>(set);
-                        newSet.Add(veg);
+                        var newSet = new List<Vegetable>(set) { veg };
                         newSets.Add(newSet);
                     }
                 }
 
                 compatibleSets.AddRange(newSets);
-                compatibleSets.Add(new List<Vegetable> { veg });
+                compatibleSets.Add([veg]);
             }
 
             return compatibleSets;
-        }
-
-        public static List<Vegetable> FindLargestCompatibleSet(List<Vegetable> vegetables)
-        {
-            var compatibleSets = FindCompatibleSets(vegetables);
-            if (compatibleSets.Count == 0)
-                return new List<Vegetable>();
-
-            for (int i = 0; i < compatibleSets.Count; i++)
-            {
-                List<Vegetable>? set = compatibleSets[i];
-                Console.WriteLine(" возможный проект огорода № " + i);
-                foreach (var veg in set)
-                {
-                    Console.WriteLine("\t" + veg.Name);
-                }
-            }
-
-            return compatibleSets.OrderByDescending(set => set.Count).First();
         }
 
         private void backToInputDataGridButton_Click(object sender, RoutedEventArgs e)
         {
             problemSolverDataInputGrid.Visibility = Visibility.Visible;
             problemSolverResultGrid.Visibility = Visibility.Collapsed;
-        }
-
-        private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-            var textBox = (TextBox)sender;
-
-            var fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
-
-            e.Handled = !double.TryParse(fullText, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _);
         }
 
         private void RehandleRequirementCombobox()
@@ -208,7 +182,6 @@ namespace DVG_MITIPS
                 requirementWarning.Visibility = Visibility.Visible;
                 characteristicsDataGrid.Visibility = Visibility.Collapsed;
             }
-
         }
 
         private void addRequirementToGardenButton_Click(object sender, RoutedEventArgs e)

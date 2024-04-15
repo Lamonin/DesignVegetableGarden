@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:DVG_MITIPS"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="Проектирование огорода. Решатель задач."
     Width="600"
     Height="400"
@@ -27,7 +28,7 @@
                 <RowDefinition Height="32" />
             </Grid.RowDefinitions>
             <TextBlock TextWrapping="Wrap">
-                Введите характеристики почвы вашего огорода и нажмите кнопку "Спроектировать огород"
+                Введите характеристики почвы огорода и нажмите на кнопку "Спроектировать огород"
             </TextBlock>
             <ui:SimpleStackPanel
                 x:Name="requirementsStackPanel"
@@ -70,7 +71,6 @@
                     <DataGridTextColumn
                         Width="1*"
                         MinWidth="120"
-                        MaxWidth="960"
                         Binding="{Binding Name}"
                         Header="Характеристика"
                         IsReadOnly="True" />
@@ -78,8 +78,7 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Margin="8,0,8,0" HorizontalAlignment="Center">
-                                    <TextBox
-                                        Grid.Column="0"
+                                    <xctk:DoubleUpDown
                                         Height="24"
                                         MinWidth="48"
                                         MinHeight="24"
@@ -87,13 +86,9 @@
                                         Padding="0"
                                         VerticalContentAlignment="Center"
                                         FontSize="12"
-                                        PreviewTextInput="TextBox_PreviewTextInput"
-                                        Text="{Binding Value, UpdateSourceTrigger=LostFocus}"
-                                        TextAlignment="Center">
-                                        <TextBox.Style>
-                                            <Style />
-                                        </TextBox.Style>
-                                    </TextBox>
+                                        ShowButtonSpinner="False"
+                                        TextAlignment="Center"
+                                        Value="{Binding Value, UpdateSourceTrigger=LostFocus}" />
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -142,8 +137,12 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="32" />
             </Grid.RowDefinitions>
-            <TextBlock x:Name="problemSolverResultTextBlock" Visibility="Collapsed" />
+            <TextBlock
+                x:Name="problemSolverResultTextBlock"
+                Text="На этом участке нельзя разместить растения."
+                Visibility="Collapsed" />
             <ScrollViewer
+                x:Name="gardenProjectsScrollView"
                 MaxHeight="180"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"

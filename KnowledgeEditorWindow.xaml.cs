@@ -184,7 +184,6 @@ namespace DVG_MITIPS
                         {
                             foreach (var vr in vegetable.VegetableRequirements)
                             {
-                                Console.WriteLine("Updated " + vegetable.Name);
                                 vr.RangeMin = vr.RangeMin;
                                 vr.RangeMax = vr.RangeMax;
                             }
@@ -344,8 +343,8 @@ namespace DVG_MITIPS
 
             DvgDialog.Specified.VegetableCharacteristicPromptDialog(this, vc, (min, max) =>
             {
-                vc.RangeMin = min;
-                vc.RangeMax = max;
+                vc.RangeMin = (double) min;
+                vc.RangeMax = (double) max;
                 _viewModel.SaveDatabase();
             });
         }

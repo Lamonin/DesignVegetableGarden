@@ -3,10 +3,8 @@ using System.Windows.Controls;
 using System.Windows;
 using ModernWpf.Controls.Primitives;
 using DVG_MITIPS.Types;
-using System.ComponentModel;
-using System.Xml.Linq;
-using System.Windows.Controls.Primitives;
 using System.Globalization;
+using Xceed.Wpf.Toolkit;
 
 namespace DVG_MITIPS
 {
@@ -81,34 +79,58 @@ namespace DVG_MITIPS
             await dialog.ShowAsync();
         }
 
+        public static class Misc
+        {
+            public static UIElement WrapWithHeader(UIElement element, string text)
+            {
+                var ssp = new SimpleStackPanel() { Spacing = 4 };
+                ssp.Children.Add(new Label() { Content = text });
+                ssp.Children.Add(element);
+                return ssp;
+            }
+        }
+
         public static class Specified
         {
             public static async void RequirementPromptDialog(Window owner, string title, string primaryLabel, string closeLabel, Action<string, double, double> primaryAction, string? defaultName = null, double? defaultMinValue = null, double? defaultMaxValue = null)
             {
                 var container = new SimpleStackPanel() { Spacing = 8 };
 
+                var minValueUpDown = new DoubleUpDown()
+                {
+                    Height = 32,
+                    ShowButtonSpinner = false,
+                    Value = defaultMinValue != null ? defaultMinValue : 0,
+                    DefaultValue = 0
+                };
+
+                var maxValueUpDown = new DoubleUpDown()
+                {
+                    Height = 32,
+                    ShowButtonSpinner = false,
+                    Value = defaultMaxValue != null ? defaultMaxValue : 1,
+                    DefaultValue = 1
+                };
+
                 TextBox requirementNameBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
                 ControlHelper.SetHeader(requirementNameBox, "Название требования");
                 if (defaultName != null) { requirementNameBox.Text = defaultName; }
 
-                TextBox minValueBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
-                ControlHelper.SetHeader(minValueBox, "Минимальное значение");
-                ControlHelper.SetPlaceholderText(minValueBox, "0");
-                minValueBox.PreviewTextInput += TextBox_PreviewTextInput;
-                if (defaultMinValue != null) { minValueBox.Text = defaultMinValue.ToString(); }
+                var grd = new Grid();
+                grd.ColumnDefinitions.Add(new ColumnDefinition());
+                grd.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(8) });
+                grd.ColumnDefinitions.Add(new ColumnDefinition());
 
-                TextBox maxValueBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
-                ControlHelper.SetHeader(maxValueBox, "Максимальное значение");
-                ControlHelper.SetPlaceholderText(maxValueBox, "1");
-                maxValueBox.PreviewTextInput += TextBox_PreviewTextInput;
-                if (defaultMaxValue != null) { maxValueBox.Text = defaultMaxValue.ToString(); }
+                var ssp1 = Misc.WrapWithHeader(minValueUpDown, "Минимальное значение");
+                var ssp2 = Misc.WrapWithHeader(maxValueUpDown, "Максимальное значение");
+                grd.Children.Add(ssp1);
+                grd.Children.Add(ssp2);
 
-                var sp = new SimpleStackPanel() { Spacing = 8, Orientation = Orientation.Horizontal };
-                sp.Children.Add(minValueBox);
-                sp.Children.Add(maxValueBox);
+                Grid.SetColumn(ssp1, 0);
+                Grid.SetColumn(ssp2, 2);
 
                 container.Children.Add(requirementNameBox);
-                container.Children.Add(sp);
+                container.Children.Add(grd);
 
                 ContentDialog dialog = new ContentDialog()
                 {
@@ -122,55 +144,52 @@ namespace DVG_MITIPS
                 dialog.PrimaryButtonClick += (o, e) =>
                 {
                     dialog.Hide();
-                    primaryAction?.Invoke(
-                        requirementNameBox.Text,
-                        double.Parse(string.IsNullOrWhiteSpace(minValueBox.Text) ? "0" : minValueBox.Text, CultureInfo.InvariantCulture),
-                        double.Parse(string.IsNullOrWhiteSpace(maxValueBox.Text) ? "1" : maxValueBox.Text, CultureInfo.InvariantCulture)
-                    );
+                    primaryAction?.Invoke(requirementNameBox.Text, (double)minValueUpDown.Value, (double)maxValueUpDown.Value);
                 };
 
                 await dialog.ShowAsync();
-
-                return;
-
-                void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-                {
-                    var textBox = (TextBox)sender;
-
-                    var fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
-
-                    e.Handled = !double.TryParse(fullText, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out _);
-                }
             }
 
-            public static async void VegetableCharacteristicPromptDialog(Window owner, VegetableRequirement vegetableRequirement, Action<double, double> primaryAction)
+            public static async void VegetableCharacteristicPromptDialog(Window owner, VegetableRequirement vegetableRequirement, Action<double?, double?> primaryAction)
             {
-                Console.WriteLine(vegetableRequirement.Requirement.MinValue + "  " +  vegetableRequirement.Requirement.MaxValue);
-
                 var container = new SimpleStackPanel() { Spacing = 8 };
 
-                TextBox minValueBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
-                ControlHelper.SetHeader(minValueBox, "Значение От");
-                ControlHelper.SetPlaceholderText(minValueBox, vegetableRequirement.RangeMin.ToString());
-                minValueBox.Text = vegetableRequirement.RangeMin.ToString(CultureInfo.InvariantCulture);
-                minValueBox.PreviewTextInput += TextBox_PreviewTextInput;
+                var minValueUpDown = new DoubleUpDown()
+                {
+                    Height = 32,
+                    Watermark = vegetableRequirement.Requirement.MinValue,
+                    Minimum = vegetableRequirement.Requirement.MinValue,
+                    Maximum = vegetableRequirement.Requirement.MaxValue,
+                    ClipValueToMinMax = true,
+                    ShowButtonSpinner = false,
+                    Value = vegetableRequirement.RangeMin,
+                    DefaultValue = vegetableRequirement.Requirement.MinValue
+                };
 
-                TextBox maxValueBox = new TextBox() { HorizontalAlignment = HorizontalAlignment.Stretch };
-                ControlHelper.SetHeader(maxValueBox, "Значение До");
-                ControlHelper.SetPlaceholderText(maxValueBox, vegetableRequirement.RangeMax.ToString());
-                maxValueBox.Text = vegetableRequirement.RangeMax.ToString(CultureInfo.InvariantCulture);
-                maxValueBox.PreviewTextInput += TextBox_PreviewTextInput;
+                var maxValueUpDown = new DoubleUpDown()
+                {
+                    Height = 32,
+                    Watermark = vegetableRequirement.Requirement.MaxValue,
+                    Minimum = vegetableRequirement.Requirement.MinValue,
+                    Maximum = vegetableRequirement.Requirement.MaxValue,
+                    ClipValueToMinMax = true,
+                    ShowButtonSpinner = false,
+                    Value = vegetableRequirement.RangeMax,
+                    DefaultValue = vegetableRequirement.Requirement.MaxValue
+                };
 
                 var grd = new Grid();
                 grd.ColumnDefinitions.Add(new ColumnDefinition());
                 grd.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(8) });
                 grd.ColumnDefinitions.Add(new ColumnDefinition());
 
-                grd.Children.Add(minValueBox);
-                grd.Children.Add(maxValueBox);
+                var ssp1 = Misc.WrapWithHeader(minValueUpDown, "Значение От");
+                var ssp2 = Misc.WrapWithHeader(maxValueUpDown, "Значение До");
+                grd.Children.Add(ssp1);
+                grd.Children.Add(ssp2);
 
-                Grid.SetColumn(minValueBox, 0);
-                Grid.SetColumn(maxValueBox, 2);
+                Grid.SetColumn(ssp1, 0);
+                Grid.SetColumn(ssp2, 2);
 
                 container.Children.Add(grd);
 
@@ -186,24 +205,10 @@ namespace DVG_MITIPS
                 dialog.PrimaryButtonClick += (o, e) =>
                 {
                     dialog.Hide();
-                    primaryAction?.Invoke(
-                        double.Parse(string.IsNullOrWhiteSpace(minValueBox.Text) ? vegetableRequirement.RangeMin.ToString() : minValueBox.Text, CultureInfo.InvariantCulture),
-                        double.Parse(string.IsNullOrWhiteSpace(maxValueBox.Text) ? vegetableRequirement.RangeMax.ToString() : maxValueBox.Text, CultureInfo.InvariantCulture)
-                    );
+                    primaryAction?.Invoke(minValueUpDown.Value, maxValueUpDown.Value);
                 };
 
                 await dialog.ShowAsync();
-
-                return;
-
-                void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-                {
-                    var textBox = (TextBox)sender;
-
-                    var fullText = textBox.Text.Insert(textBox.SelectionStart, e.Text);
-
-                    e.Handled = !double.TryParse(fullText, CultureInfo.InvariantCulture, out _);
-                }
             }
 
             public static async void CompletenesResultDialog(Window owner, DvgViewModel viewModel)
@@ -286,9 +291,7 @@ namespace DVG_MITIPS
 
             public static async void GardenProjectDialog(Window owner, GardenProject project)
             {
-                var resultText = project.Vegetables.Count > 0
-                    ? "На огороде можно разместить следующие растения:"
-                    : "На огороде нельзя разместить ни одного растения.";
+                var resultText = "На огороде можно разместить следующие растения:";
 
 
                 for (int i = 0; i < project.Vegetables.Count; i++)
@@ -312,6 +315,67 @@ namespace DVG_MITIPS
                 var dialog = new ContentDialog()
                 {
                     Title = project.Name,
+                    Content = scrollViewer,
+                    CloseButtonText = "Закрыть",
+                    Owner = owner
+                };
+
+                dialog.CloseButtonClick += (o, e) =>
+                {
+                    dialog.Hide();
+                };
+
+                await dialog.ShowAsync();
+            }
+
+            public static async void GardenProjectFailedDialog(Window owner, DvgViewModel viewModel, List<GardenCharacteristic> gardenCharacteristics, List<Requirement> unnasignedRequirements, List<(GardenCharacteristic gc, Requirement r)> badList)
+            {
+                var resultText = "Причины:";
+                var flag = false;
+
+                if (unnasignedRequirements.Count > 0)
+                {
+                    flag = true;
+                    resultText += $"\nСледующие требования нужны растениям, но не описаны для участка:";
+
+                    for (int i = 0; i < unnasignedRequirements.Count; i++)
+                    {
+                        resultText += $"\n{i + 1}. {unnasignedRequirements[i].Name}";
+                    }
+                }
+
+                if (badList.Count > 0)
+                {
+                    flag = true;
+                    resultText += $"\n\nСледующие значения характеристик не соответствуют ограничениям:";
+                    for (int i = 0; i < badList.Count; i++)
+                    {
+                        (GardenCharacteristic gc, Requirement r) = badList[i];
+                        resultText += $"\n{i + 1}. Значение характеристики {r.Name} равное {gc.Value} не попадает в диапазон от {r.MinValue} до {r.MaxValue}";
+                    }
+                }
+
+
+                if (!flag)
+                {
+                    resultText += "\nНи одно из растений не соотвествует требованиям участка.";
+                }
+
+                var scrollViewer = new ScrollViewer
+                {
+                    MaxHeight = 200,
+                    Padding = new Thickness(0, 0, 16, 0)
+                };
+
+                var container = new SimpleStackPanel() { Spacing = 8 };
+                var resultTextBlock = new TextBlock() { Text = resultText, TextWrapping = TextWrapping.Wrap };
+
+                container.Children.Add(resultTextBlock);
+                scrollViewer.Content = container;
+
+                var dialog = new ContentDialog()
+                {
+                    Title = "Невозможно составить проект огорода",
                     Content = scrollViewer,
                     CloseButtonText = "Закрыть",
                     Owner = owner
