@@ -34,6 +34,9 @@ namespace DVG_MITIPS.Types
             }
         }
 
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = 1;
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private void NotifyPropertyChanged(string propertyName)

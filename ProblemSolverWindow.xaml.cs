@@ -191,7 +191,9 @@ namespace DVG_MITIPS
             GardenCharacteristics.Add(new GardenCharacteristic()
             {
                 Name = requirement.Name,
-                Value = requirement.MinValue
+                Value = requirement.MinValue,
+                MinValue = requirement.MinValue,
+                MaxValue = requirement.MaxValue,
             });
 
             RehandleRequirementCombobox();

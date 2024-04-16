@@ -93,6 +93,18 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    <!--<DataGridTextColumn
+                        Width="auto"
+                        CanUserSort="False"
+                        Header="Диапазон"
+                        IsReadOnly="True">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0} - {1}">
+                                <Binding Path="MinValue" />
+                                <Binding Path="MaxValue" />
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>-->
                     <DataGridTemplateColumn Width="auto" Header="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
