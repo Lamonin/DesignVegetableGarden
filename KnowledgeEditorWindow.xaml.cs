@@ -343,8 +343,8 @@ namespace DVG_MITIPS
 
             DvgDialog.Specified.VegetableCharacteristicPromptDialog(this, vc, (min, max) =>
             {
-                vc.RangeMin = (double) min;
-                vc.RangeMax = (double) max;
+                vc.RangeMin = min;
+                vc.RangeMax = max;
                 _viewModel.SaveDatabase();
             });
         }
@@ -357,14 +357,14 @@ namespace DVG_MITIPS
         {
             cp_plantsComboBoxWarningLabel.Visibility = Visibility.Collapsed;
             cp_plantsComboBox.Visibility = Visibility.Visible;
-            cp_compatiblePlantsComboBox.Visibility = Visibility.Visible;
+            cp_compatibleStackPanel.Visibility = Visibility.Visible;
             cp_ListBox.Visibility = Visibility.Collapsed;
 
             if (_viewModel.Vegetables.Count == 0)
             {
                 cp_plantsComboBoxWarningLabel.Visibility = Visibility.Visible;
                 cp_plantsComboBox.Visibility = Visibility.Collapsed;
-                cp_compatiblePlantsComboBox.Visibility = Visibility.Collapsed;
+                cp_compatibleStackPanel.Visibility = Visibility.Collapsed;
                 return;
             }
 

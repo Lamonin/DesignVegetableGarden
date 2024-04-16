@@ -38,5 +38,11 @@ namespace DVG_MITIPS.Types
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Vegetable vegetable &&
+                   _name == vegetable._name;
+        }
     }
 }

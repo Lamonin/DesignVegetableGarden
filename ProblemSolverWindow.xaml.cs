@@ -53,6 +53,7 @@ namespace DVG_MITIPS
             }
 
             var unnasignedRequirements = new HashSet<Requirement>();
+            var declinedVegetables = new Dictionary<Vegetable, List<Requirement>>();
 
             foreach (var vegetable in _viewModel.Vegetables)
             {
@@ -68,7 +69,21 @@ namespace DVG_MITIPS
 
                     var gc = gardenCharacteristics[vr.Requirement.Name];
 
-                    isCanPlanted = isCanPlanted && (vr.RangeMin <= gc.Value && gc.Value <= vr.RangeMax);
+                    var isGroundCheck = (vr.RangeMin <= gc.Value && gc.Value <= vr.RangeMax);
+
+                    isCanPlanted = isCanPlanted && isGroundCheck;
+
+                    if (!isGroundCheck)
+                    {
+                        if (declinedVegetables.ContainsKey(vegetable))
+                        {
+                            declinedVegetables[vegetable].Add(vr.Requirement);
+                        }
+                        else
+                        {
+                            declinedVegetables.Add(vegetable, new List<Requirement>() { vr.Requirement });
+                        }
+                    }
                 }
 
                 if (isCanPlanted)
@@ -118,7 +133,8 @@ namespace DVG_MITIPS
                 {
                     Id = idx,
                     Name = "Проект огорода " + (idx + 1),
-                    Vegetables = compatibleSet
+                    Vegetables = compatibleSet,
+                    DeclinedVegetables = declinedVegetables
                 });
 
                 idx += 1;
@@ -136,7 +152,7 @@ namespace DVG_MITIPS
                 var newSets = new List<List<Vegetable>>();
                 foreach (var set in compatibleSets)
                 {
-                    if (set.All(v => v.CompatibleVegetables.Contains(veg)))
+                    if (set.All(v => v.CompatibleVegetables.Contains(veg) && veg.CompatibleVegetables.Contains(v)))
                     {
                         var newSet = new List<Vegetable>(set) { veg };
                         newSets.Add(newSet);
@@ -208,8 +224,8 @@ namespace DVG_MITIPS
 
         private void showGardenProjectButton(object sender, RoutedEventArgs e)
         {
-            var gardenProjectId = (int)((Button) sender).Tag;
-            DvgDialog.Specified.GardenProjectDialog(this, GardenProjects.First(gp => gp.Id == gardenProjectId));
+            var gardenProjectId = (int)((Button)sender).Tag;
+            DvgDialog.Specified.GardenProjectDialog(this, _viewModel, GardenProjects.First(gp => gp.Id == gardenProjectId));
         }
     }
 }

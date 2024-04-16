@@ -150,7 +150,7 @@ namespace DVG_MITIPS
                 await dialog.ShowAsync();
             }
 
-            public static async void VegetableCharacteristicPromptDialog(Window owner, VegetableRequirement vegetableRequirement, Action<double?, double?> primaryAction)
+            public static async void VegetableCharacteristicPromptDialog(Window owner, VegetableRequirement vegetableRequirement, Action<double, double> primaryAction)
             {
                 var container = new SimpleStackPanel() { Spacing = 8 };
 
@@ -205,7 +205,7 @@ namespace DVG_MITIPS
                 dialog.PrimaryButtonClick += (o, e) =>
                 {
                     dialog.Hide();
-                    primaryAction?.Invoke(minValueUpDown.Value, maxValueUpDown.Value);
+                    primaryAction?.Invoke((double)minValueUpDown.Value, (double)maxValueUpDown.Value);
                 };
 
                 await dialog.ShowAsync();
@@ -289,16 +289,41 @@ namespace DVG_MITIPS
                 await dialog.ShowAsync();
             }
 
-            public static async void GardenProjectDialog(Window owner, GardenProject project)
+            public static async void GardenProjectDialog(Window owner, DvgViewModel viewModel, GardenProject project)
             {
-                var resultText = "На огороде можно разместить следующие растения:";
+                var resultText = "";
 
+                var plantWithCorrectGround = viewModel.Vegetables.Where(v => !project.DeclinedVegetables.ContainsKey(v)).ToList();
+
+                if (plantWithCorrectGround.Count > 0)
+                {
+                    resultText += "Почва подходит следующим растениям:";
+                    for (int i = 0; i < plantWithCorrectGround.Count; i++)
+                    {
+                        resultText += $"\n{i + 1}. {plantWithCorrectGround[i].Name}";
+                    }
+                    resultText += "\n\n";
+                }
+
+                resultText += "На огороде можно одновременно разместить следующие растения:";
 
                 for (int i = 0; i < project.Vegetables.Count; i++)
                 {
                     Vegetable v = project.Vegetables[i];
                     resultText += $"\n{i + 1}. {v.Name}";
                 }
+
+                if (project.DeclinedVegetables.Count > 0)
+                {
+                    resultText += "\n\nХод решения:";
+                    resultText += "\nСледующим растениям не подходит почва:";
+                    var idx = 1;
+                    foreach (var dv in project.DeclinedVegetables)
+                    {
+                        resultText += $"\n{idx++}. {dv.Key.Name} (не подходят значения {string.Join(", ", dv.Value.Select(r => r.Name))})";
+                    }
+                }
+
 
                 var scrollViewer = new ScrollViewer
                 {
@@ -358,7 +383,15 @@ namespace DVG_MITIPS
 
                 if (!flag)
                 {
-                    resultText += "\nНи одно из растений не соотвествует требованиям участка.";
+                    if (viewModel.Vegetables.Count == 0)
+                    {
+                        resultText += "\nБаза знаний не содержит растений.";
+                    }
+                    else
+                    {
+                        resultText += "\nНи одно из растений не соотвествует требованиям участка.";
+
+                    }
                 }
 
                 var scrollViewer = new ScrollViewer

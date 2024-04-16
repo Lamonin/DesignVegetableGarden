@@ -5,5 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public List<Vegetable> Vegetables { get; set; }
+        public Dictionary<Vegetable, List<Requirement>> DeclinedVegetables { get; set; }
     }
 }
