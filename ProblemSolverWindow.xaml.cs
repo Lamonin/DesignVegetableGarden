@@ -1,6 +1,5 @@
 ﻿using DVG_MITIPS.Types;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -105,7 +104,7 @@ namespace DVG_MITIPS
 
             if (vegetablesThatCanBePlant.Count == 0 || unnasignedRequirements.Count > 0 || badList.Count > 0)
             {
-                DvgDialog.Specified.GardenProjectFailedDialog(this, _viewModel, GardenCharacteristics.ToList(), unnasignedRequirements.ToList(), badList);
+                DvgDialog.Specified.GardenProjectFailedDialog(this, _viewModel, declinedVegetables, GardenCharacteristics.ToList(), unnasignedRequirements.ToList(), badList);
                 return;
             }
 

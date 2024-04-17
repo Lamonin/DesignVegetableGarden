@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using System.Windows;
 using ModernWpf.Controls.Primitives;
 using DVG_MITIPS.Types;
-using System.Globalization;
 using Xceed.Wpf.Toolkit;
 
 namespace DVG_MITIPS
@@ -64,6 +63,8 @@ namespace DVG_MITIPS
                 Owner = owner
             };
 
+            dialog.IsPrimaryButtonEnabled = !string.IsNullOrEmpty(inputBox.Text);
+
             dialog.PrimaryButtonClick += (o, e) =>
             {
                 dialog.Hide();
@@ -74,6 +75,11 @@ namespace DVG_MITIPS
             {
                 dialog.Hide();
                 closeAction?.Invoke();
+            };
+
+            inputBox.TextChanged += (s, e) =>
+            {
+                dialog.IsPrimaryButtonEnabled = !string.IsNullOrEmpty(inputBox.Text);
             };
 
             await dialog.ShowAsync();
@@ -327,7 +333,7 @@ namespace DVG_MITIPS
 
                 var scrollViewer = new ScrollViewer
                 {
-                    MaxHeight = 200,
+                    MaxHeight = 300,
                     Padding = new Thickness(0, 0, 16, 0)
                 };
 
@@ -353,7 +359,7 @@ namespace DVG_MITIPS
                 await dialog.ShowAsync();
             }
 
-            public static async void GardenProjectFailedDialog(Window owner, DvgViewModel viewModel, List<GardenCharacteristic> gardenCharacteristics, List<Requirement> unnasignedRequirements, List<(GardenCharacteristic gc, Requirement r)> badList)
+            public static async void GardenProjectFailedDialog(Window owner, DvgViewModel viewModel, Dictionary<Vegetable, List<Requirement>> declinedVegetables, List<GardenCharacteristic> gardenCharacteristics, List<Requirement> unnasignedRequirements, List<(GardenCharacteristic gc, Requirement r)> badList)
             {
                 var resultText = "Причины:";
                 var flag = false;
@@ -389,14 +395,22 @@ namespace DVG_MITIPS
                     }
                     else
                     {
-                        resultText += "\nНи одно из растений не соотвествует требованиям участка.";
-
+                        resultText += "\nНи одно из растений не соотвествует требованиям участка по следующим причинам:";
+                        if (declinedVegetables.Count > 0)
+                        {
+                            //resultText += "\nСледующим растениям не подходит почва:";
+                            var idx = 1;
+                            foreach (var dv in declinedVegetables)
+                            {
+                                resultText += $"\n{idx++}. {dv.Key.Name} (не подходят значения {string.Join(", ", dv.Value.Select(r => r.Name))})";
+                            }
+                        }
                     }
                 }
 
                 var scrollViewer = new ScrollViewer
                 {
-                    MaxHeight = 200,
+                    MaxHeight = 300,
                     Padding = new Thickness(0, 0, 16, 0)
                 };
 

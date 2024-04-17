@@ -99,6 +99,11 @@ namespace DVG_MITIPS
                 {
                     if (!string.IsNullOrWhiteSpace(responseText))
                     {
+                        if (_viewModel.Vegetables.FirstOrDefault(v => v.Id != selectedVegetable.Id && v.Name.Equals(responseText, StringComparison.InvariantCultureIgnoreCase)) != null)
+                        {
+                            ModernWpf.MessageBox.Show($"Нельзя переименовать {selectedVegetable.Name} в {responseText}, т.к. в базе знаний уже есть другое растение с таким названием", "Внимание");
+                            return;
+                        }
                         selectedVegetable.Name = responseText;
                         _viewModel.SaveDatabase();
                         vegetableDataGrid.Items.Refresh();
@@ -156,12 +161,11 @@ namespace DVG_MITIPS
                     if (_viewModel.Requirements.FirstOrDefault(r => r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)) != null)
                     {
                         ModernWpf.MessageBox.Show($"Требование {name} уже было добавлено в базу знаний", "Внимание");
+                        return;
                     }
-                    else
-                    {
-                        _viewModel.Requirements.Add(new Requirement { Name = name, MinValue = min, MaxValue = max });
-                        _viewModel.SaveDatabase();
-                    }
+
+                    _viewModel.Requirements.Add(new Requirement { Name = name, MinValue = min, MaxValue = max });
+                    _viewModel.SaveDatabase();
                 }
             });
         }
@@ -175,6 +179,12 @@ namespace DVG_MITIPS
                 {
                     if (!string.IsNullOrWhiteSpace(name))
                     {
+                        if (_viewModel.Requirements.FirstOrDefault(r => r.Id != selectedRequirement.Id && r.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)) != null)
+                        {
+                            ModernWpf.MessageBox.Show($"Нельзя переименовать {selectedRequirement.Name} в {name}, т.к. в базе знаний уже есть другое требование с таким названием", "Внимание");
+                            return;
+                        }
+
                         selectedRequirement.Name = name;
                         selectedRequirement.MinValue = min;
                         selectedRequirement.MaxValue = max;
